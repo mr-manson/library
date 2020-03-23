@@ -4,7 +4,8 @@ import java.io.FileWriter;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 import by.htp.library.bean.User;
@@ -13,38 +14,39 @@ import by.htp.library.dao.UserDao;
 
 public class FileUserDao implements UserDao {
 
-	@SuppressWarnings("resource")
 	@Override
-	public boolean authorization(String login, String password) throws DaoException {
-		try {
-			FileReader reader = new FileReader("users.txt");
-			Scanner sc = new Scanner(reader);
-			
-			// получить строку из users.txt, распарсить, получить хранящиеся в ней логин и пароль и сохранить в строки:
-			String loginSaved = "qqq";
-			String passwordSaved = "www";
-			
-			if(login.equals(loginSaved) && password.equals(passwordSaved)) {
-				System.out.println("Authorization sucssesful");
+	public boolean authorization(String login, String password) throws FileNotFoundException {
+		List<User> users = getDataFromFile();
+
+		for (User user : users) {
+			if (login.equals(user.getLogin()) && password.equals(user.getPassword())) {
 				return true;
 			}
-			
-			sc.close();
-			
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
-		
 		return false;
-
-		
 	}
 
 	@Override
-	public boolean registration(User newUser) throws DaoException {
+	public boolean registration(User newUser) throws DaoException, FileNotFoundException {
+		List<User> users = getDataFromFile();
+		int newId = users.get(0).getId();
+		for (User user : users) {
+			if (newId < user.getId()) {
+				newId = user.getId() + 1;
+			}
+			
+		}
 		try {
-			FileWriter writer = new FileWriter("");
+			FileWriter writer = new FileWriter("users.txt");
+			String login = newUser.getLogin();
+			String password = newUser.getPassword();
+			
+			String str = "\nid=" + newId + " " + "login=" + login + " " + "password=" + password;
+			writer.write(str);
+			writer.flush();
+			writer.close();
+						
+
 		} catch (IOException e) {
 			throw new DaoException(e);
 		}
@@ -55,6 +57,23 @@ public class FileUserDao implements UserDao {
 	public boolean changeUserStatus(int idUser, String newStatus) {
 		// TODO Auto-generated method stub
 		return false;
+	}
+
+	private List<User> getDataFromFile() throws FileNotFoundException {
+		List<User> users = new ArrayList<User>();
+		FileReader reader = new FileReader("users.txt");
+		Scanner sc = new Scanner(reader);
+
+		while (sc.hasNextLine()) {
+			String u = sc.nextLine();
+			int id = Integer.parseInt(u.substring(3, 4));
+			String log = u.substring(11, 16);
+			String pass = u.substring(26, 30);
+			User user = new User(id, log, pass);
+			users.add(user);
+		}
+		sc.close();
+		return users;
 	}
 
 }
