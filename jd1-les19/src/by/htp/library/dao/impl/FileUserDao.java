@@ -32,7 +32,7 @@ public class FileUserDao implements UserDao {
 		int newId = users.get(0).getId();
 		for (User user : users) {
 			if (newId < user.getId()) {
-				newId = user.getId() + 1;
+				newId = user.getId();
 			}
 			
 		}
@@ -41,7 +41,7 @@ public class FileUserDao implements UserDao {
 			String login = newUser.getLogin();
 			String password = newUser.getPassword();
 			
-			String str = "\nid=" + newId + " " + "login=" + login + " " + "password=" + password;
+			String str = "\nid=" + (newId + 1) + " " + "login=" + login + " " + "password=" + password;
 			writer.write(str);
 			writer.flush();
 			writer.close();

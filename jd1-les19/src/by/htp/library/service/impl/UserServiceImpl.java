@@ -1,5 +1,7 @@
 package by.htp.library.service.impl;
 
+import java.io.FileNotFoundException;
+
 import by.htp.library.bean.User;
 import by.htp.library.dao.DaoException;
 import by.htp.library.dao.DaoProvider;
@@ -11,11 +13,13 @@ import by.htp.library.service.UserService;
 public class UserServiceImpl implements UserService {
 
 	@Override
-	public boolean authorization(String login, String password) throws ServiceException {
+	public boolean authorization(String login, String password) throws ServiceException, FileNotFoundException {
 		if (login == null || login.isEmpty()) {
 			throw new RuntimeException("error");// stub
 		}
-		// check password
+		if (password == null || password.isEmpty()) {
+			throw new RuntimeException("error");
+		}
 
 		boolean result;
 
